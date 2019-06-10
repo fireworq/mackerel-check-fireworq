@@ -19,7 +19,7 @@ type FireworqCheckApp struct {
 }
 
 type FireworqStats struct {
-	TotalFailures int64 `json:"total_failures"`
+	TotalPermanentFailures int64 `json:"total_permanent_failures"`
 }
 
 func (app *FireworqCheckApp) fetchQueueStats() (map[string]*FireworqStats, error) {
@@ -65,13 +65,13 @@ func (app *FireworqCheckApp) listFailedQueues(stats map[string]*FireworqStats) (
 	for name, stat := range stats {
 		if lastStat, ok := lastStats[name]; ok {
 			// すでに監視されているキューの場合は前回から failure が増えているか確認
-			if stat.TotalFailures > lastStat.TotalFailures {
+			if stat.TotalPermanentFailures > lastStat.TotalPermanentFailures {
 				failedQueues = append(failedQueues, name)
 			}
 		} else {
 			// 監視されていないキューなら failure があるか確認
 			// 次回からは差分が監視される
-			if stat.TotalFailures > 0 {
+			if stat.TotalPermanentFailures > 0 {
 				failedQueues = append(failedQueues, name)
 			}
 		}
